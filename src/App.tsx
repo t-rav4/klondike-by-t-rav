@@ -1,122 +1,96 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useGame } from "./hooks/useGame";
+import { Card } from "./ui/components/Card";
+import { DeckPile } from "./ui/components/DeckPile";
+import { DrawnPile } from "./ui/components/DrawnPile";
+import { Header } from "./ui/components/Header";
+import { FoundationPile } from "./ui/components/FoundationPile";
+import { Tableau } from "./ui/components/Tableau";
+import { getDraggedCards } from "./engine/getDraggedCards";
+import { CARD_LAYOUT } from "./constants/cardLayout";
+import backgroundImage from "/black-hexagon-bg.webp";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { state, dragging, startDrag, startNewGame, elapsedSeconds, won, drawCard, undoMove, redoMove } = useGame();
+
+  const draggedCards = getDraggedCards(dragging, state);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div 
+      className="game"
+      style={{
+          "--card-gap": `${CARD_LAYOUT.gap}px`,
+          "--card-width": `${CARD_LAYOUT.width}px`,
+          "--card-height": `${CARD_LAYOUT.height}px`,
+          "--tableau-overlap": `${CARD_LAYOUT.overlap}px`,
+          "backgroundImage": `url(${backgroundImage})`
+        } as React.CSSProperties
+      }>
+      <Header
+        deckSize={state.deck.length}
+        drawnSize={state.drawn.length}
+        selected={draggedCards?.[0]?.id ?? "None"}
+        handleStartNewGame={startNewGame}
+        redoMove={redoMove} 
+        undoMove={undoMove}
+      />
+
+      {/* Game Area */}
+      <div className="top-row">
+        <div className="draw-pile-area">
+          <DeckPile hasCards={state.deck.length > 0} onClick={drawCard} />
+          <DrawnPile
+            cards={state.drawn}
+            dragging={dragging}
+            startDrag={startDrag}
+          />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+        <FoundationPile
+          dragging={dragging}
+          piles={state.foundation}
+          startDrag={startDrag}
+        />
+      </div>
+
+      <Tableau
+        piles={state.tableau}
+        dragging={dragging}
+        startDrag={startDrag}
+      />
+
+      {dragging && draggedCards.length > 0 && (
+        <div
+          className="drag-preview"
+          style={{
+            left: dragging.mouseX - dragging.grabOffsetX,
+            top: dragging.mouseY - dragging.grabOffsetY,
+          }}
         >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          {draggedCards.map((card, idx) => (
+            <div
+              key={card.id}
+              style={{
+                position: "absolute",
+                top: idx * CARD_LAYOUT.tableauOffset,
+              }}
+            >
+              <Card card={card} />
+            </div>
+          ))}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {won && (
+        <div className="win-overlay">
+          <h1>You Win!</h1>
+          <button onClick={startNewGame}>New Game</button>
+        </div>
+      )}
+
+      <div>
+        <p>{elapsedSeconds}</p>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
