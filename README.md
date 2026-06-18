@@ -1,73 +1,69 @@
-# React + TypeScript + Vite
+# Klondike Clone
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based implementation of Klondike Solitaire built with React and TypeScript.
 
-Currently, two official plugins are available:
+## Project overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Play Klondike (classic solitaire) in the browser.
+- Game logic and rules are implemented in `src/engine`.
+- UI components live in `src/ui/components` and the app entry is `src/main.tsx`.
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Vite (dev server & build)
+- React 19
+- TypeScript
+- ESLint & Prettier for linting/formatting
 
-## Expanding the ESLint configuration
+## Project structure (important folders)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `src/engine` — core game logic, rules, and move handling
+- `src/ui/components` — React components for cards, piles, and UI
+- `src/hooks` — custom hooks (e.g. `useGame`)
+- `public` — static assets served by Vite
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+## Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Node.js (16+ recommended)
+- npm (or use a compatible package manager)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+## Install & run
+
+Install dependencies:
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Start development server:
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+npm run dev
 ```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview a production build locally:
+
+```bash
+npm run preview
+```
+
+Run linting and formatting:
+
+```bash
+npm run lint
+npm run format
+```
+
+## Where to look first
+
+- App entry: `src/main.tsx`
+- Core rules: `src/engine/rules`
+- Move implementations: `src/engine/moves`
+
+---
